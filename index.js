@@ -21,14 +21,17 @@ app.get('/api/:ip', (req, res, next) => {
     const dbo = db.db("meta");
     const query = {};
     const pipeline = { "key": ip };
-    dbo.collection("todos").find(pipeline).toArray(function (err, result) {
-      console.log("🚀 ~ file: index.js:27 ~ result", result)
-      if (err) throw err;
-      db.close();
-      res.send(
-        result
-      );
-    });
+    try {
+      dbo.collection("todos").find(pipeline).toArray(function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        res.type('html').send(str(result))
+        db.close();
+      });
+    }
+    catch (err) {
+      console.error(err);
+    }
   });
 });
 
@@ -40,14 +43,17 @@ app.get('/api', (req, res, next) => {
     const dbo = db.db("meta");
     const query = {};
     const pipeline = {};
-    dbo.collection("todos").find(pipeline).toArray(function (err, result) {
-      console.log("🚀 ~ file: index.js:27 ~ result", result)
-      if (err) throw err;
-      db.close();
-      res.send(
-        result
-      );
-    });
+    try {
+      dbo.collection("todos").find(pipeline).toArray(function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        res.type('html').send(str(result))
+        db.close();
+      });
+    }
+    catch (err) {
+      console.error(err);
+    }
   });
 });
 
