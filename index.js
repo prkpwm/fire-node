@@ -83,7 +83,7 @@ const html = `
   </head>
   <body>
     <section>
-      Hello from Render!
+      Hello!, This is a test page for the API
     </section>
   </body>
 </html>
