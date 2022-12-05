@@ -9,56 +9,50 @@ const url = `mongodb+srv://prkpwm:${passwd}@cluster0.5zkwnn4.mongodb.net/?retryW
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+let dbConenction = null;
 
+MongoClient.connect(url, function (err, db) {
+  if (err) throw err;
+  const dbo = db.db("meta");
+  dbConenction = dbo;
+});
 
 app.get("/", (req, res) => res.type('html').send(html));
+
+app.get("/test", (req, res) =>res.type('html').send('test'));
 
 app.get('/api/:ip', (req, res, next) => {
   console.info(req.params);
   const ip = req.params.ip;
-  MongoClient.connect(url, function (err, db) {
-    if (err) throw err;
-    const dbo = db.db("meta");
-    const query = {};
-    const pipeline = { "key": ip };
-    try {
-      dbo.collection("todos").find(pipeline).toArray(function (err, result) {
-        if (err) throw err;
-        console.log(result);
-        res.type('html').send(str(result))
-        db.close();
-      });
-    }
-    catch (err) {
-      console.error(err);
-    }
-  });
+  const pipeline = { key: ip };
+  try {
+    dbConenction.collection("todos").find(pipeline).toArray(function (err, result) {
+      if (err) throw err;
+      res.send(result)
+    });
+  }
+  catch (err) {
+    console.error(err);
+  }
+
 });
 
 app.get('/api', (req, res, next) => {
   console.info(req.params);
-  const ip = req.params.ip;
-  MongoClient.connect(url, function (err, db) {
-    if (err) throw err;
-    const dbo = db.db("meta");
-    const query = {};
-    const pipeline = {};
-    try {
-      dbo.collection("todos").find(pipeline).toArray(function (err, result) {
-        if (err) throw err;
-        console.log(result);
-        res.type('html').send(str(result))
-        db.close();
-      });
-    }
-    catch (err) {
-      console.error(err);
-    }
-  });
+  const pipeline = {};
+  try {
+    dbConenction.collection("todos").find(pipeline).toArray(function (err, result) {
+      if (err) throw err;
+      res.send(result)
+    });
+  }
+  catch (err) {
+    console.error(err);
+  }
 });
 
 
-app.post('/api/todos', (req, res, next) => {
+app.post('/todos', (req, res, next) => {
   console.info(req.body);
   const body = req.body
   MongoClient.connect(url, function (err, db) {
