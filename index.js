@@ -1,6 +1,10 @@
 const express = require('express');
 const PORT = 3000;
 const app = express();
+const cors = require('cors');
+app.use(cors({
+  origin: 'https://resume-prkpwm-api.onrender.com'
+}));
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
