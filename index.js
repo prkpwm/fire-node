@@ -24,6 +24,7 @@ app.get('/api/:ip', (req, res, next) => {
         const query = {};
         const pipeline = { "key": ip };
         dbo.collection("todos").find(pipeline).toArray(function (err, result) {
+            console.log("🚀 ~ file: index.js:27 ~ result", result)
             if (err) throw err;
             res.send(
                 result
