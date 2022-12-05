@@ -26,10 +26,10 @@ app.get('/api/:ip', (req, res, next) => {
         dbo.collection("todos").find(pipeline).toArray(function (err, result) {
             console.log("🚀 ~ file: index.js:27 ~ result", result)
             if (err) throw err;
+            db.close();
             res.send(
                 result
             );
-            db.close();
         });
     });
 });
@@ -43,10 +43,10 @@ app.post('/api/todos', (req, res, next) => {
         const dbo = db.db("meta");
         dbo.collection("todos").insertOne(body, function (err, result) {
             if (err) throw err;
+            db.close();
             res.send(
                 result
             );
-            db.close();
         });
     });
 });
