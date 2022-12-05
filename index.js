@@ -9,11 +9,12 @@ const url = `mongodb+srv://prkpwm:${passwd}@cluster0.5zkwnn4.mongodb.net/?retryW
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-let dbConenction = null;
+var dbConenction = null;
 
 MongoClient.connect(url, function (err, db) {
   if (err) throw err;
   const dbo = db.db("meta");
+  console.log("🚀 ~ file: index.js:17 ~ dbo", dbo)
   dbConenction = dbo;
 });
 
@@ -60,7 +61,6 @@ app.post('/todos', (req, res, next) => {
     const dbo = db.db("meta");
     dbo.collection("todos").insertOne(body, function (err, result) {
       if (err) throw err;
-      db.close();
       res.send(
         result
       );
