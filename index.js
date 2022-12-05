@@ -31,6 +31,24 @@ app.get('/api/:ip', (req, res, next) => {
 });
 
 
+app.post('/api/todos', (req, res, next) => {
+    console.info(req.body);
+    const body = req.body
+    MongoClient.connect(url, function (err, db) {
+        if (err) throw err;
+        const dbo = db.db("meta");
+        dbo.collection("todos").insertOne(body, function (err, result) {
+            if (err) throw err;
+            res.send(
+                result
+            );
+            db.close();
+        });
+    });
+});
+
+
+
 
 app.listen(PORT, () => {
     console.info('Server is running on PORT:', PORT);
