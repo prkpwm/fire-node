@@ -14,46 +14,65 @@ app.use(bodyParser.json());
 app.get("/", (req, res) => res.type('html').send(html));
 
 app.get('/api/:ip', (req, res, next) => {
-    console.info(req.params);
-    const ip = req.params.ip;
-    MongoClient.connect(url, function (err, db) {
-        if (err) throw err;
-        const dbo = db.db("meta");
-        const query = {};
-        const pipeline = { "key": ip };
-        dbo.collection("todos").find(pipeline).toArray(function (err, result) {
-            console.log("🚀 ~ file: index.js:27 ~ result", result)
-            if (err) throw err;
-            db.close();
-            res.send(
-                result
-            );
-        });
+  console.info(req.params);
+  const ip = req.params.ip;
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    const dbo = db.db("meta");
+    const query = {};
+    const pipeline = { "key": ip };
+    dbo.collection("todos").find(pipeline).toArray(function (err, result) {
+      console.log("🚀 ~ file: index.js:27 ~ result", result)
+      if (err) throw err;
+      db.close();
+      res.send(
+        result
+      );
     });
+  });
+});
+
+app.get('/api', (req, res, next) => {
+  console.info(req.params);
+  const ip = req.params.ip;
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    const dbo = db.db("meta");
+    const query = {};
+    const pipeline = {};
+    dbo.collection("todos").find(pipeline).toArray(function (err, result) {
+      console.log("🚀 ~ file: index.js:27 ~ result", result)
+      if (err) throw err;
+      db.close();
+      res.send(
+        result
+      );
+    });
+  });
 });
 
 
 app.post('/api/todos', (req, res, next) => {
-    console.info(req.body);
-    const body = req.body
-    MongoClient.connect(url, function (err, db) {
-        if (err) throw err;
-        const dbo = db.db("meta");
-        dbo.collection("todos").insertOne(body, function (err, result) {
-            if (err) throw err;
-            db.close();
-            res.send(
-                result
-            );
-        });
+  console.info(req.body);
+  const body = req.body
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    const dbo = db.db("meta");
+    dbo.collection("todos").insertOne(body, function (err, result) {
+      if (err) throw err;
+      db.close();
+      res.send(
+        result
+      );
     });
+  });
 });
 
 
 
 
 app.listen(PORT, () => {
-    console.info('Server is running on PORT:', PORT);
+  console.info('Server is running on PORT:', PORT);
 });
 
 
