@@ -21,7 +21,7 @@ app.get("/", (req, res) => res.type('html').send(html));
 
 app.get("/test", (req, res) =>res.type('html').send('test'));
 
-app.get('/api/:ip', (req, res, next) => {
+app.get('/chat/:ip', (req, res, next) => {
   console.info(req.params);
   const ip = req.params.ip;
   const pipeline = { key: ip };
@@ -37,7 +37,7 @@ app.get('/api/:ip', (req, res, next) => {
 
 });
 
-app.get('/api', (req, res, next) => {
+app.get('/allchat', (req, res, next) => {
   const pipeline = {};
   try {
     dbConenction.collection("todos").find(pipeline).toArray(function (err, result) {
@@ -51,7 +51,7 @@ app.get('/api', (req, res, next) => {
 });
 
 
-app.post('/todos', (req, res, next) => {
+app.post('/chat', (req, res, next) => {
   const body = req.body
   MongoClient.connect(url, function (err, db) {
     if (err) throw err;
