@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    build: .
+    volumes:
+      - .:/usr/src/app/
+      - dependencies:/usr/src/app/node_modules
+    working_dir: /usr/src/app
+    environment:
+      NODE_ENV: development
+    ports:
+      - 3000:3000
+    command: node index.js
+volumes:
+  dependencies:

@@ -9,6 +9,13 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+
+app.get('/', (req, res, next) => {
+    console.info(req.params);
+    res.send('Hello World!')
+});
+
+
 app.get('/api/:ip', (req, res, next) => {
     console.info(req.params);
     const ip = req.params.ip;
