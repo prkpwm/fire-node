@@ -14,7 +14,6 @@ var dbConenction = null;
 MongoClient.connect(url, function (err, db) {
   if (err) throw err;
   const dbo = db.db("meta");
-  console.log("🚀 ~ file: index.js:17 ~ dbo", dbo)
   dbConenction = dbo;
 });
 
@@ -39,7 +38,6 @@ app.get('/api/:ip', (req, res, next) => {
 });
 
 app.get('/api', (req, res, next) => {
-  console.info(req.params);
   const pipeline = {};
   try {
     dbConenction.collection("todos").find(pipeline).toArray(function (err, result) {
@@ -54,7 +52,6 @@ app.get('/api', (req, res, next) => {
 
 
 app.post('/todos', (req, res, next) => {
-  console.info(req.body);
   const body = req.body
   MongoClient.connect(url, function (err, db) {
     if (err) throw err;
