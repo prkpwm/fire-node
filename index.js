@@ -21,14 +21,14 @@ app.use(
     limit: '1mb',
     extended: true,
   }),
-  );
-  
-  
-  app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(bodyParser.json());
-  
-  const passwd = encodeURIComponent('@uth0rizedIsByPa$$=???')
-  const url = `mongodb+srv://prkpwm:${passwd}@cluster0.5zkwnn4.mongodb.net/?retryWrites=true&w=majority`;
+);
+
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+const passwd = encodeURIComponent('@uth0rizedIsByPa$$=???')
+const url = `mongodb+srv://prkpwm:${passwd}@cluster0.5zkwnn4.mongodb.net/?retryWrites=true&w=majority`;
 
 app.get("/", (req, res) => res.type('html').send(html));
 
@@ -45,6 +45,8 @@ app.get('/chat/:ip', (req, res, next) => {
       dbo.collection("todos").find(pipeline).toArray(function (err, result) {
         if (err) throw err;
         res.send(result)
+        db.close();
+
       });
     });
 
@@ -64,6 +66,7 @@ app.get('/allchat', (req, res, next) => {
       dbo.collection("todos").find(pipeline).toArray(function (err, result) {
         if (err) throw err;
         res.send(result)
+        db.close();
       });
     });
 
@@ -84,6 +87,8 @@ app.post('/chat', (req, res, next) => {
       res.send(
         result
       );
+      db.close();
+
     });
   });
 });
