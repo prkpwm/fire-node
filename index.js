@@ -5,9 +5,7 @@ const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const bodyParser = require('body-parser');
 
-app.use(cors({
-  origin: 'https://resume-prkpwm.web.app'
-}));
+
 const whitelist = ['https://resume-prkpwm.web.app', 'https://resume-prkpwm.firebaseapp.com', 'http://localhost:4200'];
 
 
