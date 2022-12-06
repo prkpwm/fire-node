@@ -2,38 +2,54 @@ const express = require('express');
 const PORT = 3000;
 const app = express();
 const cors = require('cors');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const bodyParser = require('body-parser');
+
 app.use(cors({
   origin: 'https://resume-prkpwm.web.app'
 }));
+const whitelist = ['https://resume-prkpwm.web.app', 'https://resume-prkpwm.firebaseapp.com', 'http://localhost:4200'];
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const passwd = encodeURIComponent('@uth0rizedIsByPa$$=???')
-const url = `mongodb+srv://prkpwm:${passwd}@cluster0.5zkwnn4.mongodb.net/?retryWrites=true&w=majority`;
-const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-var dbConenction = null;
-
-MongoClient.connect(url, function (err, db) {
-  if (err) throw err;
-  const dbo = db.db("meta");
-  dbConenction = dbo;
-});
+const corsOption = (req, callback) => {
+  let corsOptions;
+  if (whitelist.indexOf(req.header('Origin')) !== -1) corsOptions = { origin: true, credentials: true };
+  else corsOptions = { origin: false, credentials: true };
+  callback(null, corsOptions);
+};
+app.use(cors(corsOption));
+app.use(
+  bodyParser.urlencoded({
+    limit: '1mb',
+    extended: true,
+  }),
+  );
+  
+  
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
+  
+  const passwd = encodeURIComponent('@uth0rizedIsByPa$$=???')
+  const url = `mongodb+srv://prkpwm:${passwd}@cluster0.5zkwnn4.mongodb.net/?retryWrites=true&w=majority`;
 
 app.get("/", (req, res) => res.type('html').send(html));
 
-app.get("/test", (req, res) =>res.type('html').send('test'));
+app.get("/test", (req, res) => res.type('html').send('test'));
 
 app.get('/chat/:ip', (req, res, next) => {
   console.info(req.params);
   const ip = req.params.ip;
   const pipeline = { key: ip };
   try {
-    dbConenction.collection("todos").find(pipeline).toArray(function (err, result) {
+    MongoClient.connect(url, function (err, db) {
       if (err) throw err;
-      res.send(result)
+      const dbo = db.db("meta");
+      dbo.collection("todos").find(pipeline).toArray(function (err, result) {
+        if (err) throw err;
+        res.send(result)
+      });
     });
+
   }
   catch (err) {
     console.error(err);
@@ -44,10 +60,15 @@ app.get('/chat/:ip', (req, res, next) => {
 app.get('/allchat', (req, res, next) => {
   const pipeline = {};
   try {
-    dbConenction.collection("todos").find(pipeline).toArray(function (err, result) {
+    MongoClient.connect(url, function (err, db) {
       if (err) throw err;
-      res.send(result)
+      const dbo = db.db("meta");
+      dbo.collection("todos").find(pipeline).toArray(function (err, result) {
+        if (err) throw err;
+        res.send(result)
+      });
     });
+
   }
   catch (err) {
     console.error(err);
