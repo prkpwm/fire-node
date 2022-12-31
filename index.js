@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const bodyParser = require('body-parser');
-
+const http = require("http");
 
 const whitelist = ['https://resume-prkpwm.web.app', 'https://resume-prkpwm.firebaseapp.com', 'http://localhost:4200'];
 
@@ -94,6 +94,124 @@ app.post('/chat', (req, res, next) => {
 });
 
 
+async function checkLocation() {
+  try {
+    return await new Promise((resolve, reject) => {
+      http.get("http://ipinfo.io/", res => {
+        res.setEncoding("utf8");
+        let body = "";
+        res.on("data", data => {
+          body += data;
+        });
+        res.on("end", () => {
+          try {
+            const dataPoint = JSON.parse(body);
+            resolve(splitLocation(dataPoint.loc));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+    });
+  } catch (e) {
+    console.log("error send get location request:", e);
+    return ["ESGL", "ESGL"]; // Error send get location request
+  }
+}
+
+function splitLocation(loc) {
+  return loc.split(",");
+}
+
+function findClosestStation(lat, lng, stations) {
+  let closest = null;
+  let closestDistance = null;
+  for (let i = 0; i < stations.length; i++) {
+    const station = stations[i];
+    const distance = Math.sqrt(
+      Math.pow(lat - station.lat, 2) + Math.pow(lng - station.long, 2)
+    );
+    if (closestDistance === null || distance < closestDistance) {
+      closest = station;
+      closestDistance = distance;
+    }
+  }
+  return closest;
+}
+
+
+async function checkWeather(lat, long) {
+  try {
+    const apiKeys = "7c12a791bd19806a6d1fde2ff0af8824";
+    return await new Promise((resolve, reject) => {
+      http.get(`http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=${apiKeys}&lang=th`, res => {
+        res.setEncoding("utf8");
+        let body = "";
+        res.on("data", data => {
+          body += data;
+        });
+        res.on("end", () => {
+          try {
+            const dataPoint = JSON.parse(body);
+            resolve(dataPoint);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+    });
+  }
+  catch (e) {
+    console.log("error send get weather request:", e);
+    return ["ESGL", "ESGL"]; // Error send get location request
+  }
+}
+
+
+async function checkWeatherPM25() {
+  // check pm 2.5
+  try {
+    return await new Promise((resolve, reject) => {
+      http.get("http://air4thai.pcd.go.th/services/getNewAQI_JSON.php", res => {
+        res.setEncoding("utf8");
+        let body = "";
+        res.on("data", data => {
+          body += data;
+        });
+        res.on("end", async () => {
+          try {
+            const dataPoint = JSON.parse(body);
+            const [lat, lng] = await checkLocation()
+            const station = findClosestStation(lat, lng, dataPoint.stations)
+            const weather = await checkWeather(lat, lng)
+            const weatherDescription = [
+              station.AQILast.PM25.value,
+              station.areaTH,
+              weather,
+            ];
+            resolve(weatherDescription)
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+    });
+  } catch (e) {
+    console.log("error send get location request:", e);
+    return ["ESGL", "ESGL"]; // Error send get location request
+  }
+
+}
+
+app.get('/weather', async (req, res, next) => {
+  const weather = await checkWeatherPM25();
+  res.send(weather);
+});
+
+app.get('/location', async (req, res, next) => {
+  const [lat, lng] = await checkLocation();
+  res.send({ lat, lng });
+});
 
 
 app.listen(PORT, () => {
