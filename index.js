@@ -94,10 +94,10 @@ app.post('/chat', (req, res, next) => {
 });
 
 
-async function checkLocation() {
+async function checkLocation(ip) {
   try {
     return await new Promise((resolve, reject) => {
-      http.get("http://ipinfo.io/", res => {
+      http.get(`http://ipinfo.io/${ip}?token=6e2a87a9ba4e14`, res => {
         res.setEncoding("utf8");
         let body = "";
         res.on("data", data => {
@@ -168,7 +168,7 @@ async function checkWeather(lat, long) {
 }
 
 
-async function checkWeatherPM25() {
+async function checkWeatherPM25(ip) {
   // check pm 2.5
   try {
     return await new Promise((resolve, reject) => {
@@ -181,13 +181,14 @@ async function checkWeatherPM25() {
         res.on("end", async () => {
           try {
             const dataPoint = JSON.parse(body);
-            const [lat, lng] = await checkLocation()
+            const [lat, lng] = await checkLocation(ip)
             const station = findClosestStation(lat, lng, dataPoint.stations)
             const weather = await checkWeather(lat, lng)
             const weatherDescription = [
               station.AQILast.PM25.value,
               station.areaTH,
               weather,
+
             ];
             resolve(weatherDescription)
           } catch (e) {
@@ -203,8 +204,9 @@ async function checkWeatherPM25() {
 
 }
 
-app.get('/weather', async (req, res, next) => {
-  const weather = await checkWeatherPM25();
+app.get('/weather/:ip', async (req, res, next) => {
+  const ip = req.params.ip;
+  const weather = await checkWeatherPM25(ip);
   res.send(weather);
 });
 
