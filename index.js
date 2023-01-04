@@ -225,7 +225,7 @@ app.listen(PORT, () => {
   setInterval(() => {
     console.log('Server is running on PORT:', PORT);
   }
-    , 1000 * 60 * 60);
+    , 1000 * 60);
 });
 
 
