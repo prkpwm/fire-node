@@ -7,7 +7,25 @@ const bodyParser = require('body-parser');
 const http = require("http");
 
 const whitelist = ['https://resume-prkpwm.web.app', 'https://resume-prkpwm.firebaseapp.com', 'http://localhost:4200'];
-
+let BLOCKED = [
+  ".player-container > div",
+  '.GoogleActiveViewInnerContainer',
+  '.GoogleActiveViewElement',
+  ".dfp-container",
+  '[alt="Advertisement"]',
+  '.ads-column',
+  '.ads-bottom',
+  '.ads-left',
+  '.ads-right',
+  '.ads-top',
+  '.right-floating-banana-container',
+  '.left-floating-banana-container',
+  '.floating-banana-container',
+  '.header-banana_container',
+  '.horizontal-ad-bar100-h360',
+  '.horizontal-ad-bar100-small',
+  '.style-scope ytd-ad-slot-renderer'
+]
 
 const corsOption = (req, callback) => {
   let corsOptions;
@@ -217,7 +235,20 @@ app.get('/location', async (req, res, next) => {
 
 
 app.get('/getBlockedList', async (req, res, next) => {
-  res.type('html').send(tm_html)
+  res.json({ BLOCKED });
+});
+
+app.post('/addBlocked', async (req, res, next) => {
+  const body = req.body.BLOCKED
+  BLOCKED = body
+  res.json({ BLOCKED });
+});
+
+app.post('/removeBlocked', async (req, res, next) => {
+  const body = req.body.BLOCKED
+  BLOCKED = body
+  res.json({ BLOCKED });
+
 });
 
 
@@ -282,204 +313,3 @@ const html = `
   </body>
 </html>
 `
-
-
-const tm_html = `
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  <style type="text/css">
-    .remove {
-      background-color: red;
-      color: white;
-      width: 10%;
-      height: 100%;
-      font-weight: bold;
-      font-size: 20px;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid black;
-      cursor: pointer;
-    }
-
-    .remove:hover {
-      background-color: white;
-      color: red;
-    }
-
-    input {
-      width: 80%;
-      height: 100%;
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    input:focus {
-      outline: none;
-    }
-
-    input::placeholder {
-      color: red;
-    }
-
-    div.content {
-      width: 400px;
-      height: 50px;
-    }
-
-
-    .flex-row {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      column-gap: 1rem;
-    }
-
-    .add {
-      background-color: green;
-      color: white;
-      height: 100%;
-      font-weight: bold;
-      font-size: 20px;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid black;
-      cursor: pointer;
-    }
-
-    .add:hover {
-      background-color: white;
-      color: green;
-    }
-
-    .add>div {
-      transform: rotate(225deg);
-    }
-  </style>
-
-  <script type="text/javascript">
-    let BLOCKED = [
-      ".player-container > div",
-      '.GoogleActiveViewInnerContainer',
-      '.GoogleActiveViewElement',
-      ".dfp-container",
-      '[alt="Advertisement"]',
-      '.ads-column',
-      '.ads-bottom',
-      '.ads-left',
-      '.ads-right',
-      '.ads-top',
-      '.right-floating-banana-container',
-      '.left-floating-banana-container',
-      '.floating-banana-container',
-      '.header-banana_container',
-      '.horizontal-ad-bar100-h360',
-      '.horizontal-ad-bar100-small',
-      '.style-scope ytd-ad-slot-renderer'
-    ];
-
-    loadBlocked = () => {
-      const cookies = getCookies()
-      if (cookies) {
-        BLOCKED = cookies.split(',')
-      }
-      BLOCKED.forEach((value) => {
-        addEl(value)
-      })
-    }
-
-    addEl = (value) => {
-      const el = document.createElement('div')
-      el.className = 'content'
-      const input = document.createElement('input')
-      input.type = 'text'
-      input.value = value
-      el.appendChild(input)
-      const button = document.createElement('button')
-      button.innerText = 'X'
-      button.className = 'remove'
-      button.addEventListener('click', () => {
-        const index = BLOCKED.indexOf(value)
-        BLOCKED.splice(index, 1)
-        setCookie('BLOCKED', BLOCKED.join(','), 365)
-        el.remove()
-      })
-      el.appendChild(button)
-      document.body.appendChild(el)
-    }
-
-    onAddEl = () => {
-      const el = document.createElement('div')
-      el.className = 'content'
-      const input = document.createElement('input')
-      input.type = 'text'
-      input.placeholder = 'Enter CSS Selector'
-      el.appendChild(input)
-      const button = document.createElement('button')
-      button.innerText = 'X'
-      button.className = 'remove'
-      button.addEventListener('click', () => {
-        el.remove()
-      })
-
-      input.addEventListener('change', () => {
-        if (!BLOCKED.find((value) => value === input.value)) {
-          BLOCKED.push(input.value)
-          setCookie('BLOCKED', BLOCKED.join(','), 365)
-        }
-      })
-      el.appendChild(button)
-      document.body.appendChild(el)
-    }
-
-    setCookie = (cname, cvalue, exdays) => {
-      var d = new Date();
-      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-      var expires = "expires=" + d.toUTCString();
-      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-    }
-
-    getCookies = () => {
-      var name = "BLOCKED=";
-      var decodedCookie = decodeURIComponent(document.cookie);
-      var ca = decodedCookie.split(';');
-      for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-          c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-          return c.substring(name.length, c.length);
-        }
-      }
-      return "";
-    }
-
-
-
-  </script>
-
-</head>
-
-<body>
-  <div class="flex-row">
-    <h1>
-      BLOCKED LIST
-    </h1>
-    <div>
-      <button class="add" onclick="onAddEl()">
-        <div>
-          X
-        </div>
-      </button>
-    </div>
-    <script charset="UTF-8">
-      loadBlocked()
-    </script> 
-  </div>
-</body>
-</html>
-`;
